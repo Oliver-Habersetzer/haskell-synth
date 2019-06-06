@@ -23,7 +23,8 @@ data Note = Note
         key :: BaseKey,
         octave :: Int,
         start :: String,
-        end :: String
+        end :: String,
+        vol :: Float
     } deriving (Show, Generic)
 
 instance FromJSON Note
