@@ -8,11 +8,12 @@ module AppSettings (
 
 import System.Console.CmdArgs
 
+appSettings :: AppSettings
 appSettings = AppSettings {
             mode = Render
                 &= help "Apllication mode - options:\n- live\n- render (default)",
             tuning = 440
-                &= help "Tuning base frequency for A1 in Hz (default: 440 Hz)",
+                &= help "Tuning base frequency for A4 in Hz (default: 440 Hz)",
             intstrumentPath = ""
                 &= help "Input file for instrument settings (.json-instr)",
             scorePath = ""
@@ -25,7 +26,7 @@ appSettings = AppSettings {
 
 data AppSettings = AppSettings {
             mode :: AppMode,
-            tuning :: Int,
+            tuning :: Float,
             intstrumentPath :: String,
             scorePath :: String,
             outputPath :: String

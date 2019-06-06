@@ -10,13 +10,13 @@ import Data.Aeson
 import GHC.Generics
 import qualified Data.ByteString.Lazy as BS
 
+readScores :: FilePath -> IO Scores
 readScores path = do
     bytes <- BS.readFile path
     let mb = decode bytes :: Maybe (Scores)
     return $ mbV mb
     where mbV (Just a) = a
           mbV (Nothing) = error $ "Could not parse " ++ path ++ " to scores"
-
 
 data Note = Note
     {
@@ -26,7 +26,6 @@ data Note = Note
         end :: String,
         vol :: Float
     } deriving (Show, Generic)
-
 instance FromJSON Note
 instance ToJSON Note
 
@@ -35,7 +34,6 @@ data Score = Score
         instrumentName :: String,
         notes :: [Note]
     } deriving (Show, Generic)
-
 instance FromJSON Score
 instance ToJSON Score
 
@@ -46,6 +44,5 @@ data Scores = Scores
         divisionsPerBeat :: Int,
         scores :: [Score]
     } deriving (Show, Generic)
-
 instance FromJSON Scores
 instance ToJSON Scores

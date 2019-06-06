@@ -21,10 +21,7 @@ runApp (AppSettings Live tuning intsrumentPath _ _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     putStrLn "Live mode"
     putStrLn $ show instruments
-  
-    
 
--- helper functions
 -- return error if path is empty
 nopath param [] = error $ "No path for \"" ++ param ++ "\" specified"
 nopath param str = str

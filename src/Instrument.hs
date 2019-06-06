@@ -9,6 +9,7 @@ import Data.Aeson
 import GHC.Generics
 import qualified Data.ByteString.Lazy as BS
 
+readInstruments :: FilePath -> IO [Instrument]
 readInstruments path = do
     bytes <- BS.readFile path
     let mb = decode bytes :: Maybe (Instruments)
