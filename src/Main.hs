@@ -3,12 +3,21 @@ module Main where
 import AppMode
 import System.Console.CmdArgs
 import Instrument
+import Score
 
 main = runApp =<< cmdArgs appModes
 
 runApp (Render intsrumentPath scorePath outputPath) = do
-    putStrLn "RENDER"
+    instruments <- readInstruments $ nopath "instrument" intsrumentPath
+    scores <- readScores $ nopath "score" scorePath
+    putStrLn "Render mode"
+    putStrLn $ show instruments
+    putStrLn $ show scores
 
 runApp (Live intsrumentPath) = do
-    instrument <- readInstruments intsrumentPath
-    putStrLn $ show instrument
+    instruments <- readInstruments $ nopath "instrument" intsrumentPath
+    putStrLn "Live mode"
+    putStrLn $ show instruments
+
+nopath param [] = error $ "No path for \"" ++ param ++ "\" specified"
+nopath param str = str

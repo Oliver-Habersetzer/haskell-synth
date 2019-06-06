@@ -19,6 +19,8 @@ executable fp-project
   hs-source-dirs:      src
   other-modules:       AppMode
                      , Instrument
+                     , Score
+                     , Key
 
 test-suite test
   type:             exitcode-stdio-1.0
