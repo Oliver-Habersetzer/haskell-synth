@@ -25,6 +25,10 @@ data Note = Note
         start :: String,
         end :: String,
         vol :: Float
+        -- optional ends for automation
+        endKey :: Maybe BaseKey
+        endOctave :: Maybe Int
+        endVol :: Maybe Double
     } deriving (Show, Generic)
 instance FromJSON Note
 instance ToJSON Note
