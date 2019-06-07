@@ -26,7 +26,7 @@ appSettings = AppSettings {
 
 data AppSettings = AppSettings {
             mode :: AppMode,
-            tuning :: Float,
+            tuning :: Double,
             intstrumentPath :: String,
             scorePath :: String,
             outputPath :: String

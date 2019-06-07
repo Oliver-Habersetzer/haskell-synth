@@ -24,7 +24,7 @@ data BaseKey = A | Ais | B | C | Cis | D | Dis | E | F | Fis | G | Gis deriving 
 instance FromJSON BaseKey
 instance ToJSON BaseKey
 
-baseKeyIndex :: BaseKey -> Float
+baseKeyIndex :: BaseKey -> Double
 baseKeyIndex A = 0
 baseKeyIndex Ais = 1
 baseKeyIndex B  = 2
@@ -38,13 +38,13 @@ baseKeyIndex Fis = -3
 baseKeyIndex G = -2
 baseKeyIndex Gis = -1
 
-keyToFreq :: Key -> Float -> Float
+keyToFreq :: Key -> Double -> Double
 keyToFreq (Key baseKey octave) tuning = transpose (baseKeyFreq baseKey tuning) (octave - 4)
 
-baseKeyFreq :: BaseKey -> Float -> Float
+baseKeyFreq :: BaseKey -> Double -> Double
 baseKeyFreq baseKey tuning = tuning * (2.0 ** ((baseKeyIndex baseKey) / 12.0))
 
-transpose :: Float -> Int -> Float
+transpose :: Double -> Int -> Double
 transpose baseFreq octave
         | octave < 0
             = transpose (baseFreq / 2.0) (octave + 1)
@@ -89,5 +89,5 @@ qwertzToKey c o = _int $ toLower c
             | '0' == c = Key Dis (4 + o)
             | 'p' == c = Key E (4 + o)
 
-qwertzToFreq :: Char -> Int -> Float -> Float
+qwertzToFreq :: Char -> Int -> Double -> Double
 qwertzToFreq char offset tuning = keyToFreq (qwertzToKey char offset) tuning
