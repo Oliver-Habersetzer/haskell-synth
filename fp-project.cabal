@@ -15,12 +15,21 @@ executable fp-project
                      , cmdargs
                      , aeson
                      , bytestring
+                     , random
   default-language:    Haskell2010
   hs-source-dirs:      src
+                     , src/oscilators
   other-modules:       AppSettings
                      , Instrument
                      , Score
                      , Key
+                     , Oscilator
+                     , SineOsc
+                     , SawOsc
+                     , SquareOsc
+                     , WavetableOsc
+                     , TriangleOsc
+                     , NoiseOsc
 
 test-suite test
   type:             exitcode-stdio-1.0
