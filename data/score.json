@@ -2,15 +2,35 @@
     "beatsPerMinute": 140,
     "beatsPerBar": 4,
     "divisionsPerBeat": 4,
+    "trackFx": [],
     "scores": [
         {
             "instrumentName": "Default",
+            "scoreFx": [],
             "notes": [
                 {
                     "key": "A",
-                    "octave": 1, 
+                    "octave": 4, 
                     "start": "0.0.0",
                     "end": "1.0.0",
+                    "vol": 0.5
+                }
+            ]
+        },
+        {
+            "instrumentName": "Wavetable",
+            "scoreFx": [
+                {
+                    "fxName": "invert",
+                    "operators": []
+                }],
+            "notes": [
+                {
+                    "key": "E",
+                    "octave": 4, 
+                    "endOctave": 3, 
+                    "start": "1.0.0",
+                    "end": "2.0.0",
                     "vol": 0.5
                 }
             ]
