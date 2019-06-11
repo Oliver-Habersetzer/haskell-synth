@@ -4,6 +4,7 @@ import AppSettings
 import System.Console.CmdArgs
 import Instrument
 import Score
+import Render
 
 -- parse cli arguments
 main = do
@@ -14,6 +15,7 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     scores <- readScores $ nopath "score" scorePath
     putStrLn "Render mode"
+    render instruments scores tuning outputPath
 
 -- live mode
 runApp (AppSettings Live tuning intsrumentPath _ _) = do

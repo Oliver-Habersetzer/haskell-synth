@@ -1,7 +1,13 @@
 {
     "instruments": [
         {
-            "name": "Default"
+            "name": "Default",
+            "oscilator": "sine"
+        },
+        {
+            "name": "Wavetable",
+            "oscilator": "wavetable",
+            "samples": [0, 1, -1, 1, -1, 0]
         }
     ]
 }

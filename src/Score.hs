@@ -1,14 +1,20 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Score (
-    Score,
-    readScores
+    Score (Score),
+    Scores (Scores),
+    Note,
+    InternalNote (..),
+    readScores,
+    toInternalNote
 ) where
 
 import Key
 import Data.Aeson
 import GHC.Generics
 import qualified Data.ByteString.Lazy as BS
+import Effects
+import Data.List.Split
 
 readScores :: FilePath -> IO Scores
 readScores path = do
@@ -33,9 +39,45 @@ data Note = Note
 instance FromJSON Note
 instance ToJSON Note
 
+data InternalNote = InternalNote {
+        startFreq :: Double,
+        endFreq :: Double,
+        startAmp :: Double,
+        endAmp :: Double,
+        startBar :: Int,
+        endBar :: Int,
+        startBeat :: Int,
+        endBeat :: Int,
+        startDivision :: Int,
+        endDivision :: Int
+    } deriving (Show)
+
+toInternalNote :: Note -> Double -> InternalNote    
+toInternalNote a t = do
+    let _endKey = justOrDef (endKey a) (key a)
+    let _endOctave = justOrDef (endOctave a) (Score.octave a)
+    let _start = map read (splitOn "." (start a)) :: [Int]
+    let _end = map read (splitOn "." (end a)) :: [Int]
+    InternalNote
+            (keyToFreq (Key (key a) (Score.octave a)) t)
+            (keyToFreq (Key _endKey _endOctave) t)
+            (vol a)
+            (justOrDef (endVol a) (vol a))
+            (_start !! 0)
+            (_end !! 0)
+            (_start !! 1)
+            (_end !! 1)
+            (_start !! 2)
+            (_end !! 2)
+    where
+            justOrDef (Just a) _ = a
+            justOrDef Nothing def = def
+        
+
 data Score = Score
     {
         instrumentName :: String,
+        scoreFx :: [Effect],
         notes :: [Note]
     } deriving (Show, Generic)
 instance FromJSON Score
@@ -46,6 +88,7 @@ data Scores = Scores
         beatsPerMinute :: Int,
         beatsPerBar :: Int,
         divisionsPerBeat :: Int,
+        trackFx :: [Effect],
         scores :: [Score]
     } deriving (Show, Generic)
 instance FromJSON Scores

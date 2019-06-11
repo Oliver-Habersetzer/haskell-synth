@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Instrument (
-    Instrument,
+    Instrument (..),
     readInstruments
 ) where
 
@@ -20,7 +20,9 @@ readInstruments path = do
 
 data Instrument = Instrument
     {
-        name :: String
+        name :: String,
+        oscilator :: String,
+        samples :: Maybe [Double]
     } deriving (Show, Generic)
 
 instance FromJSON Instrument
