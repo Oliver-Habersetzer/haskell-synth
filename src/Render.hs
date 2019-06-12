@@ -12,6 +12,8 @@ import Data.List
 import Data.Int
 import qualified Data.ByteString.Lazy as B
 import Data.Binary
+import AppSettings
+import System.IO
 
 clamp x
     | x < -1 = -1
@@ -57,7 +59,10 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
         toTime (fromIntegral eBr, fromIntegral eBt, fromIntegral eDv) bpm bpb dpb
     )
 
-render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath = do
+render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay = do
+    putStr "Rendering... "
+    hFlush stdout
+
     -- convert input data to internal format
     let track = InternalTrack bpm bpb dpb 
             [
@@ -79,19 +84,43 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath = do
 
     -- render individual scores
     let _renderedScores = map (\s -> renderScore s _baseTimes) _scores
+    -- sum up all channels
+    let _scoreSum = map sum (transpose _renderedScores)
     -- TODO: apply effects
-    let _renderedTrack = map sigmoid $ map sum (transpose _renderedScores)
-    let _intSamples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) _renderedTrack :: [Int16]
+    -- apply sigmoid to prevent clipping
+    let _renderedTrack = map sigmoid _scoreSum
+    -- generate int samples from doubles
+    let _intSamples = trackToSamples stereoMode stereoDelay _renderedTrack
+    -- putStrLn $ show _intSamples
+    -- let _intSamples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) _renderedTrack :: [Int16]
 
-    writeFile outputPath (show _renderedTrack)
-    B.writeFile (outputPath ++ ".bin") ((encode (_intSamples :: [Int16])))
+    -- write output file
+    renderToFile _intSamples
 
-    putStrLn $ show track
-    putStrLn "---"
-    putStrLn $ show _renderedTrack
-    putStrLn "---"
+    -- writeFile outputPath (show _renderedTrack)
+
+    -- putStrLn $ show track
+    -- putStrLn "---"
+    -- putStrLn $ show _renderedTrack
+    putStrLn "Done"
     
-    where renderScore score baseTimes = do
+    where 
+        trackToSamples Mono _ samples
+                = [channelToSamples samples]
+        trackToSamples Invert _ samples
+                = [
+                    channelToSamples (map (\x -> (-x)) samples),
+                    channelToSamples samples
+                ]
+        trackToSamples Delay sd samples
+                = [
+                    channelToSamples (n0s ++ samples),
+                    channelToSamples (samples ++ n0s)
+                ]
+                where n0s = [0..(fromIntegral sd)] :: [Double]
+        channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
+        renderToFile samples = B.writeFile outputPath ((encode ((concat $ transpose samples) :: [Int16])))
+        renderScore score baseTimes = do
             let _timedNotes = map (\n -> toTimedNote n (fromIntegral bpm) (fromIntegral bpb) (fromIntegral dpb)) (Render.notes score)
             let _renderedNotes = map (\t -> sum $ map (\n -> intersectingNote t n) _timedNotes) baseTimes
 
