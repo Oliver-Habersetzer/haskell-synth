@@ -15,7 +15,7 @@ waitPayback = do
 main = do
     args <- getArgs
     filename <- case args of
-      a : _ -> /./test.wav
+      a : _ -> pura a
       _ -> fail "usage: proteaaudio-play SAMPLE_FILE_NAME"
 
     result <- initAudio 64 44100 1024 -- max channels, mixing frequency, mixing buffer size
