@@ -91,17 +91,10 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
     let _renderedTrack = map sigmoid _scoreSum
     -- generate int samples from doubles
     let _intSamples = trackToSamples stereoMode stereoDelay _renderedTrack
-    -- putStrLn $ show _intSamples
-    -- let _intSamples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) _renderedTrack :: [Int16]
 
     -- write output file
     renderToFile _intSamples
 
-    -- writeFile outputPath (show _renderedTrack)
-
-    -- putStrLn $ show track
-    -- putStrLn "---"
-    -- putStrLn $ show _renderedTrack
     putStrLn "Done"
     
     where 
