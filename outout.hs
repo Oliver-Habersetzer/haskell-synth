@@ -9,7 +9,7 @@ import Sound.ProteaAudio
 waitPayback = do
   n <- soundActive
   when  (n > 0) $ do
-    threadDelay 1000000
+    threadDelay 100
     waitPayback
 -----------------
 -- /home/pz/Schreibtisch/FunktionalProg/Projekt/test.wav
@@ -30,14 +30,17 @@ main = do
 --      a : _ -> pure a
 --      _ -> fail "usage: proteaaudio-play SAMPLE_FILE_NAME"
     let filename = "/home/pz/Schreibtisch/FunktionalProg/Projekt/test.wav"
+
     result <- initAudio 64 44100 1024 -- max channels, mixing frequency, mixing buffer size
+
     unless result $ fail "failed to initialize the audio system"
 
     -- (A) load sample from file
     sampleA <- sampleFromFile filename 1.0 -- volume
-  
+
     soundPlay sampleA 1 1 0 1 -- left volume, right volume, time difference between left and right, pitch factor for playback
-    waitPayback
+
+ --   waitPayback
 
     -- (B) load from memory buffer
     buffer <- SB.readFile filename
@@ -46,6 +49,7 @@ main = do
       ".wav" -> sampleFromMemoryWav buffer 1.0
 
     soundPlay sampleB 1 1 0 1 -- left volume, right volume, time difference between left and right, pitch factor for playback
-    waitPayback
+ --   waitPayback
 
+    
     finishAudio
