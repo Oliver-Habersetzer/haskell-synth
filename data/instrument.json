@@ -5,6 +5,18 @@
             "oscilator": "sine"
         },
         {
+            "name": "saw",
+            "oscilator": "saw"
+        },
+        {
+            "name": "square",
+            "oscilator": "square"
+        },
+        {
+            "name": "noise",
+            "oscilator": "noise"
+        },
+        {
             "name": "Wavetable",
             "oscilator": "wavetable",
             "samples": [0, 1, -1, 1, -1, 0]
