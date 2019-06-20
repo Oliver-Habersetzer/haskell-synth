@@ -6,6 +6,7 @@ module Score (
     Note,
     InternalNote (..),
     readScores,
+    writeScore,
     toInternalNote
 ) where
 
@@ -15,6 +16,9 @@ import GHC.Generics
 import qualified Data.ByteString.Lazy as BS
 import Effects
 import Data.List.Split
+
+writeScore :: FilePath -> Scores -> IO ()
+writeScore path scores = BS.writeFile path $ encode scores
 
 readScores :: FilePath -> IO Scores
 readScores path = do
@@ -85,7 +89,7 @@ instance ToJSON Score
 
 data Scores = Scores
     {
-        beatsPerMinute :: Int,
+        beatsPerMinute :: Double,
         beatsPerBar :: Int,
         divisionsPerBeat :: Int,
         trackFx :: [Effect],

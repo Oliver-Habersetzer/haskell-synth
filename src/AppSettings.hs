@@ -33,7 +33,10 @@ appSettings = AppSettings {
                 &= help "Stereo mode options:\n- mono (default)       one channel\n- invert               invert left channel (may result in bass-less audio on mono speakers)\n- delay (recomended)   delay left channel n samples (see delay samples option)",
             delaySamples = 20
                 &= typ "INTEGER"
-                &= help "Sample count to delay the left channel by (requires '-t=delay' option)"
+                &= help "Sample count to delay the left channel by (requires '-t=delay' option)",
+            playAfterRender = True
+                &= typ "BOOL"
+                &= help "Play back wave file after rendering"
         }
         &= summary "Haskell project"
 
@@ -44,7 +47,8 @@ data AppSettings = AppSettings {
             scorePath :: String,
             outputPath :: String,
             twoChannelMode :: TwoChannelMode,
-            delaySamples :: Int
+            delaySamples :: Int,
+            playAfterRender :: Bool
         } deriving (Show, Data, Typeable)
 
 data TwoChannelMode = Mono | Invert | Delay deriving (Show, Data, Typeable)
