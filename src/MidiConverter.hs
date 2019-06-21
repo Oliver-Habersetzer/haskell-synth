@@ -60,6 +60,9 @@ convertMidiToScoreFile inPath outPath = do
             (maybeFirst $ filter (\(_, setTempo, _) -> isJust setTempo) parsedTracks)
 
     putStrLn "\nEnter the names of the tracks with notes. You can enter sine, saw, square or triangle for the corressponding oscilators. Entering an invalid name (one which isn't defined in the instruments file) will not render the track. You can use this for example for drum tracks.\n"
+
+    putStrLn $ "Found " ++ (show noteTrackC) ++ " tracks"
+
     instrumentNames <- getInstrumentNames noteTrackC noteTrackC
 
     putStrLn $ "\nTempo: " ++ (show ppqn) ++ " Pulses/quarter note"
