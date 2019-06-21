@@ -3,7 +3,7 @@
 module Score (
     Score (Score),
     Scores (Scores),
-    Note,
+    Note (Note),
     InternalNote (..),
     readScores,
     writeScore,

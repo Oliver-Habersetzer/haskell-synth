@@ -5,7 +5,9 @@ module Key (
     Key (..),
     keyToFreq,
     qwertzToKey,
-    qwertzToFreq
+    qwertzToFreq,
+    midiPitchToBaseKey,
+    midiPitchToOctave
 ) where
 
 import GHC.Generics
@@ -37,6 +39,22 @@ baseKeyIndex F = -4
 baseKeyIndex Fis = -3
 baseKeyIndex G = -2
 baseKeyIndex Gis = -1
+
+midiPitchToOctave midiPitch = quot (midiPitch - 12) 12
+midiPitchToBaseKey midiPitch = _midiPitchToBaseKey $ midiPitch `mod` 12
+        where
+                _midiPitchToBaseKey 9 = A
+                _midiPitchToBaseKey 10 = Ais
+                _midiPitchToBaseKey 11 = B
+                _midiPitchToBaseKey 0 = C
+                _midiPitchToBaseKey 1 = Cis
+                _midiPitchToBaseKey 2 = D
+                _midiPitchToBaseKey 3 = Dis
+                _midiPitchToBaseKey 4 = E
+                _midiPitchToBaseKey 5 = F
+                _midiPitchToBaseKey 6 = Fis
+                _midiPitchToBaseKey 7 = G
+                _midiPitchToBaseKey 8 = Gis
 
 keyToFreq :: Key -> Double -> Double
 keyToFreq (Key baseKey octave) tuning = transpose (baseKeyFreq baseKey tuning) (octave - 4)

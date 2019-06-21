@@ -15,6 +15,7 @@ import Sound.MIDI.File.Event.Meta (ElapsedTime, fromElapsedTime)
 import qualified Sound.MIDI.Message.Channel as ChannelMsg
 import qualified Sound.MIDI.Message.Channel.Voice as Voice
 import System.IO
+import Key
 
 data NoteAction = On | Off deriving Show
 
@@ -42,7 +43,9 @@ convertMidiToScoreFile inPath outPath = do
     let parsedTracks = filter filterEmptyTracks $ map parseTrack tracks
 
     let noteTracks =
+            -- remove unnecessary fields
             map (\(_, _, events) -> events)
+            -- remove empty tracks
             $ filter (\(_, _, events) -> isNotEmpty events) parsedTracks
     let noteTrackC = length noteTracks
     let timeSignature =
@@ -56,12 +59,10 @@ convertMidiToScoreFile inPath outPath = do
             snd3 <$>
             (maybeFirst $ filter (\(_, setTempo, _) -> isJust setTempo) parsedTracks)
 
-    putStrLn "\nEnter the names of the tracks with notes.\nYou can enter sine, saw, square or triangle for a corressponding oscilators\n"
+    putStrLn "\nEnter the names of the tracks with notes. You can enter sine, saw, square or triangle for the corressponding oscilators. Entering an invalid name (one which isn't defined in the instruments file) will not render the track. You can use this for example for drum tracks.\n"
     instrumentNames <- getInstrumentNames noteTrackC noteTrackC
 
-    mapM_ (\t -> putStrLn $ show t) noteTracks
-
-    putStrLn $ "Tempo: " ++ (show ppqn) ++ " Pulses/quarter note"
+    putStrLn $ "\nTempo: " ++ (show ppqn) ++ " Pulses/quarter note"
     putStrLn $ "Tracks with notes: " ++ (show noteTrackC)
     putStrLn $ "Instrument names: " ++ (show instrumentNames)
     putStrLn $ "Time signature: " ++ (show timeSignature)
@@ -70,16 +71,74 @@ convertMidiToScoreFile inPath outPath = do
     -- convert timecode
     let bpm = 60000000.0 / (fromIntegral setTempo)
     let bpb = (\(v, _, _, _) -> v) timeSignature :: Int
-    let dpb = ppqn
+    let dpb = ppqn :: Int
+    -- convert raw time to score timecode
+    let noteTracksTC = map (\events -> map (
+                \(time, channel, onOff, note, volume) -> (rawDivsToTimecode (fromIntegral bpb) (fromIntegral dpb) time, channel, onOff, note, volume)
+            ) events) noteTracks
+
+    let convertedNoteTracks = map (\events -> do
+                let len = length events
+                let startIndexes = [x | x <- [0..(len - 1)], eventIsOn $ events !! x]
+                let mapped = map (\i -> do
+                            let startEvent = events !! i
+                            let remList = drop i events
+                            let match = findFirstMatchingOff startEvent remList
+                            match
+                        ) startIndexes
+                map matchedEventToNote mapped
+            ) noteTracksTC
+    let scores = map toScore $ zip instrumentNames convertedNoteTracks
+
     putStrLn "\nCalculated timecode:"
     putStrLn $ "  Beats per minute: " ++ (show bpm)
     putStrLn $ "  Beats per bar: " ++ (show bpb)
     putStrLn $ "  Divisions per beat: " ++ (show dpb)
 
-    -- return
-    return $ Scores bpm bpb dpb [] []
+    -- mapM_ (\t -> putStrLn $ show t) scores
+
+    return $ Scores bpm bpb dpb [] scores
 
     where
+        toScore (iName, notes) = Score iName [] notes
+
+        matchedEventToNote (start, end, channel, note, volume) =
+                Note
+                (midiPitchToBaseKey note)
+                (midiPitchToOctave note)
+                start
+                end
+                ((fromIntegral volume) / 127.0)
+                Nothing
+                Nothing
+                Nothing
+
+        findFirstMatchingOff (startTime, targetChannel, _, targetNote, volume) ((endTime, channel, onOff, note, _):xs) = do
+                if (length xs == 0) || (targetChannel == channel && targetNote == note && isOff onOff) then
+                        (startTime, endTime, channel, note, volume)
+                else
+                        findFirstMatchingOff (startTime, targetChannel, On, targetNote, volume) xs
+
+
+        isOn On = True
+        isOn Off = False
+        eventIsOn (_, _, onOff, _, _) = isOn onOff
+
+        isOff Off = True
+        isOff On = False
+        eventIsOff (_, _, onOff, _, _) = isOff onOff
+
+        rawDivsToTimecode :: Integer -> Integer -> Integer -> String
+        rawDivsToTimecode bpb dpb _divs = do
+                let divs = _divs `mod` dpb
+                let _beats = quot _divs dpb
+                let beats = _beats `mod` bpb
+                let bars = quot _beats bpb
+                let sDivs = show divs
+                let sBeats = show beats
+                let sBars = show bars
+                sBars ++ "." ++ sBeats ++ "." ++ sDivs
+
         getInstrumentNames 0 c = return []
         getInstrumentNames n c = do 
             putStr $ "Instrument name for channel " ++ (show (1 + c - n)) ++ ": "
