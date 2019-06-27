@@ -63,6 +63,8 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
     )
 
 render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay = do
+    putStrLn "Render mode"
+    
     putStr "Rendering... "
     hFlush stdout
 

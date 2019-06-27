@@ -18,6 +18,9 @@ executable fp-project
                      , random
                      , split
                      , binary
+                     , glib
+                     , gtk2hs-buildtools
+                     , gtk
   default-language:    Haskell2010
   hs-source-dirs:      src
                      , src/oscilators
@@ -28,6 +31,7 @@ executable fp-project
                      , Oscilators
                      , Render
                      , Effects
+                     , Live
 
 test-suite test
   type:             exitcode-stdio-1.0
