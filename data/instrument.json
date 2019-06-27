@@ -5,6 +5,10 @@
             "oscilator": "sine"
         },
         {
+            "name": "triangle",
+            "oscilator": "triangle"
+        },
+        {
             "name": "saw",
             "oscilator": "saw"
         },

@@ -15,8 +15,7 @@ import qualified Data.ByteString.Builder as BB
 import Data.Binary
 import AppSettings
 import System.IO
-import Data.List.Split
-import Data.Char
+import Utils
 
 clamp x
     | x < -1 = -1
@@ -28,7 +27,7 @@ sigmoid x = 2.0 / (1.0 + exp (negate x)) - 1.0
 remap x in_min in_max out_min out_max = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 data InternalTrack = InternalTrack {
-        beatsPerMinute :: Int,
+        beatsPerMinute :: Double,
         beatsPerBar :: Int,
         divisionsPerBeat :: Int,
         scores :: [InternalScore],
@@ -62,7 +61,7 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
         toTime (fromIntegral eBr, fromIntegral eBt, fromIntegral eDv) bpm bpb dpb
     )
 
-render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay = do
+render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender = do
     putStr "Rendering... "
     hFlush stdout
 
@@ -79,7 +78,7 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
     -- get end of track
     let _scores = Render.scores track
     let _allNotes = concat (map Render.notes _scores)
-    let _timedNotes = map (\n -> toTimedNote n (fromIntegral bpm) (fromIntegral bpb) (fromIntegral dpb)) _allNotes
+    let _timedNotes = map (\n -> toTimedNote n (bpm) (fromIntegral bpb) (fromIntegral dpb)) _allNotes
     let _endTime = maximum $ map (\(_, _, _, _, _, et) -> et) _timedNotes
     let _sampleCount = round $ 44100 * _endTime :: Int
     let _baseSamples = [0.._sampleCount]
@@ -97,8 +96,16 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
 
     -- write output file
     renderToFile _intSamples
+    
 
-    putStrLn "Done"
+    if playAfterRender then do
+        if (isExt outputPath "wav") then do
+            putStrLn "Done"
+            putStrLn "TODO: PLAYBACK"
+        else do
+            fail "Can't play back raw files but rendering was completed."
+    else do
+        putStrLn "Done"
     
     where 
         trackToSamples Mono _ samples
@@ -116,18 +123,20 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
                 where n0s = [0..(fromIntegral sd)] :: [Double]
         channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
         renderToFile samples
-                | isWave = do
+                | (isExt outputPath "wav") = do
                     B.writeFile outputPath $ B.concat $
                             [
+                            -- wave
                             -- magic number
                               encInt ("RIFF" :: String)
 
                             -- wave header
-                            -- TODO: <Dateigröße> − 8
-                            , enc32E (0 :: Int32) -- data length
+                            -- data length
+                            , enc32E (0 :: Int32)
                             , encInt ("WAVE" :: String)
 
                             -- format header
+                            -- magic number
                             , encInt ("fmt " :: String)
                             -- fmt header size
                             , enc32E (16 :: Int32)
@@ -144,9 +153,9 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
                             -- +2B = 16B: bit per sample
                             , enc16E (bitPerSample :: Int16)
 
-                            -- data header
+                            -- data block
+                            -- magic number
                             , encInt ("data" :: String)
-                            -- TODO: Länge des Datenblocks, max. <Dateigröße> − 44
                             -- data size
                             , enc32E (fromIntegral (dataLen - 44) :: Int32)
                         ] ++ (map enc16E flatSamples)
@@ -159,11 +168,9 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
                     fs = chC * (floor (((fromIntegral bitPerSample) + 7) / 8))
                     bitPerSample = 16
                     dataLen = (length flatSamples) * 2
-        isWave = (map toLower ext) == "wav"
-            where ext = last (splitOn "." outputPath)
         encInt d = B.drop 8 $ encode d
         renderScore score baseTimes = do
-            let _timedNotes = map (\n -> toTimedNote n (fromIntegral bpm) (fromIntegral bpb) (fromIntegral dpb)) (Render.notes score)
+            let _timedNotes = map (\n -> toTimedNote n (bpm) (fromIntegral bpb) (fromIntegral dpb)) (Render.notes score)
             let _renderedNotes = map (\t -> sum $ map (\n -> intersectingNote t n) _timedNotes) baseTimes
 
             _renderedNotes
