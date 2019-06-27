@@ -18,6 +18,9 @@ executable fp-project
                      , random
                      , split
                      , binary
+                     , glib
+                     , gtk2hs-buildtools
+                     , gtk
                      , midi
                      , event-list
                      , directory
@@ -33,6 +36,7 @@ executable fp-project
                      , Oscilators
                      , Render
                      , Effects
+                     , Live
                      , Utils
                      , MidiConverter
                      , Playback
