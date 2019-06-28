@@ -14,7 +14,7 @@ main = do
     runApp =<< cmdArgs appSettings
 
 -- render mode
-runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender) = do
+runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender _) = do
     putStrLn "Render mode"
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     
@@ -34,7 +34,7 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode
 
 
 -- live mode
-runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _) = do
+runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     putStrLn "Live mode"
 
