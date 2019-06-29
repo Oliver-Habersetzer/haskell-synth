@@ -12,7 +12,7 @@ import GHC.Generics
 import Data.Aeson
 import Data.Char
 
-data Key = Key
+data Key = NoKey | Key
     {
         baseKey :: BaseKey,
         octave :: Int
@@ -88,6 +88,7 @@ qwertzToKey c o = _int $ toLower c
             | 'o' == c = Key D (4 + o)
             | '0' == c = Key Dis (4 + o)
             | 'p' == c = Key E (4 + o)
+            | otherwise = NoKey
 
 qwertzToFreq :: Char -> Int -> Double -> Double
 qwertzToFreq char offset tuning = keyToFreq (qwertzToKey char offset) tuning
