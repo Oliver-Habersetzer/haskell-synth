@@ -16,6 +16,7 @@ import Data.Binary
 import AppSettings
 import System.IO
 import Utils
+import Playback
 
 clamp x
     | x < -1 = -1
@@ -101,7 +102,8 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
     if playAfterRender then do
         if (isExt outputPath "wav") then do
             putStrLn "Done"
-            putStrLn "TODO: PLAYBACK"
+            putStrLn "Enjoy!"
+            play outputPath
         else do
             fail "Can't play back raw files but rendering was completed."
     else do

@@ -36,7 +36,10 @@ appSettings = AppSettings {
                 &= help "Sample count to delay the left channel by (requires '-t=delay' option)",
             playAfterRender = True
                 &= typ "BOOL"
-                &= help "Play back wave file after rendering"
+                &= help "Play back wave file after rendering",
+            defaultInstrument = "saw"
+                &= typ "INSTRUMENT"
+                &= help "Default instrument to use in live mode. Options:\n- saw\n- sine\n- square\n- triangle"
         }
         &= summary "Haskell project"
 
@@ -48,7 +51,8 @@ data AppSettings = AppSettings {
             outputPath :: String,
             twoChannelMode :: TwoChannelMode,
             delaySamples :: Int,
-            playAfterRender :: Bool
+            playAfterRender :: Bool,
+            defaultInstrument :: String
         } deriving (Show, Data, Typeable)
 
 data TwoChannelMode = Mono | Invert | Delay deriving (Show, Data, Typeable)
