@@ -10,6 +10,15 @@ import System.Glib.UTFString
 import Data.Char
 import Key
 
+keyConv key = do
+    let keyString = safeKeyString $ glibToString key
+    if (length keyString) == 1 then do
+        let c = keyString !! 0
+        let musicalKey = qwertzToKey c 0
+        musicalKey
+    else do
+        NoKey
+
 safeKeyString str
         | str == "comma" = ","
         | str == "period" = "."
@@ -21,22 +30,16 @@ live = do
     window <- windowNew
     window `on` deleteEvent $ liftIO mainQuit >> return False
     window `on` focus $ \dirtype -> putStrLn "focused!" >> return False
-
+    windowSetKeepAbove window True
     window `on` keyReleaseEvent $ tryEvent $ do
         key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
-        liftIO $ putStrLn (glibToString key ++ " released ")
+        let x = keyConv key
+        liftIO $ putStrLn (show x ++ " released")
 
     window `on` keyPressEvent $ tryEvent $ do
         key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
-        let keyString = safeKeyString $ glibToString key
-        liftIO $ putStrLn keyString
-        if (length keyString) == 1 then do
-            let c = keyString !! 0
-            let musicalKey = qwertzToKey c 0
-            liftIO $ putStrLn $ [c] ++ " -> " ++ (show musicalKey)
-        else do
-            liftIO $ putStrLn $ "Uninteresting key..."
-
+        let x = keyConv key
+        liftIO $ putStrLn (show x ++ " pressed")
 
     widgetShowAll window
     mainGUI
