@@ -33,10 +33,11 @@ live = do
                 , windowDefaultWidth  := 400
                 , windowDefaultHeight := 400 ]
     
-    image <- imageNewFromFile ""
-    
     window `on` deleteEvent $ liftIO mainQuit >> return False
     window `on` focus $ \dirtype -> putStrLn "focused!" >> return False
+    image <- imageNewFromFile "./resources/qwertz-layout.png"
+    containerAdd window image
+    widgetShowAll window
     windowSetKeepAbove window True
     
     window `on` keyReleaseEvent $ tryEvent $ do
