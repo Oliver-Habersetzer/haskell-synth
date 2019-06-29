@@ -62,7 +62,7 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
         toTime (fromIntegral eBr, fromIntegral eBt, fromIntegral eDv) bpm bpb dpb
     )
 
-render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender = do
+render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender loop = do
     putStr "Rendering... "
     hFlush stdout
 
@@ -103,7 +103,7 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
         if (isExt outputPath "wav") then do
             putStrLn "Done"
             putStrLn "Enjoy!"
-            play outputPath
+            play outputPath loop
         else do
             fail "Can't play back raw files but rendering was completed."
     else do

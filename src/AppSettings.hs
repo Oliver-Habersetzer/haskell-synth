@@ -39,7 +39,10 @@ appSettings = AppSettings {
                 &= help "Play back wave file after rendering",
             defaultInstrument = "saw"
                 &= typ "INSTRUMENT"
-                &= help "Default instrument to use in live mode. Options:\n- saw\n- sine\n- square\n- triangle"
+                &= help "Default instrument to use in live mode. Options:\n- saw\n- sine\n- square\n- triangle",
+            loop = False
+                &= typ "BOOL"
+                &= help "Loop the audio output (Ctrl+C cancel)"
         }
         &= summary "Haskell project"
 
@@ -52,7 +55,8 @@ data AppSettings = AppSettings {
             twoChannelMode :: TwoChannelMode,
             delaySamples :: Int,
             playAfterRender :: Bool,
-            defaultInstrument :: String
+            defaultInstrument :: String,
+            loop :: Bool
         } deriving (Show, Data, Typeable)
 
 data TwoChannelMode = Mono | Invert | Delay deriving (Show, Data, Typeable)

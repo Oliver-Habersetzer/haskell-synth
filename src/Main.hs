@@ -14,7 +14,7 @@ main = do
     runApp =<< cmdArgs appSettings
 
 -- render mode
-runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender _) = do
+runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender _ loop) = do
     putStrLn "Render mode"
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     
@@ -26,15 +26,15 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode
         writeScore outScorePath scores
         putStrLn $ "\n!!! Conversion done: The converted score file has been saved to " ++ outScorePath ++ " !!!\n"
         -- scores <- readScores $ nopath "score" outScorePath
-        render instruments scores tuning outputPath stereoMode delaySamples playAfterRender
+        render instruments scores tuning outputPath stereoMode delaySamples playAfterRender loop
     else do
         putStrLn "OK"
         scores <- readScores $ nopath "score" scorePath
-        render instruments scores tuning outputPath stereoMode delaySamples playAfterRender
+        render instruments scores tuning outputPath stereoMode delaySamples playAfterRender loop
 
 
 -- live mode
-runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ _) = do
+runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ _ _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     putStrLn "Live mode"
 
