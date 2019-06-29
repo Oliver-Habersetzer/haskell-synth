@@ -28,9 +28,17 @@ safeKeyString str
 live = do
     initGUI
     window <- windowNew
+    set window [  windowTitle         := "Synthi"
+                , windowResizable     := False
+                , windowDefaultWidth  := 400
+                , windowDefaultHeight := 400 ]
+    
+    image <- imageNewFromFile ""
+    
     window `on` deleteEvent $ liftIO mainQuit >> return False
     window `on` focus $ \dirtype -> putStrLn "focused!" >> return False
     windowSetKeepAbove window True
+    
     window `on` keyReleaseEvent $ tryEvent $ do
         key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
         let x = keyConv key
