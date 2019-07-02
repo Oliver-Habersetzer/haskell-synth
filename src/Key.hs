@@ -7,14 +7,16 @@ module Key (
     qwertzToKey,
     qwertzToFreq,
     midiPitchToBaseKey,
-    midiPitchToOctave
+    baseKeys,
+    midiPitchToOctave,
+    keyPath
 ) where
 
 import GHC.Generics
 import Data.Aeson
 import Data.Char
 
-data Key = Key
+data Key = NoKey | Key
     {
         baseKey :: BaseKey,
         octave :: Int
@@ -25,6 +27,8 @@ instance ToJSON Key
 data BaseKey = A | Ais | B | C | Cis | D | Dis | E | F | Fis | G | Gis deriving (Show, Generic)
 instance FromJSON BaseKey
 instance ToJSON BaseKey
+
+baseKeys = [C, Cis, D, Dis, E, F, Fis, G, Gis, A, Ais, B]
 
 baseKeyIndex :: BaseKey -> Double
 baseKeyIndex A = 0
@@ -39,6 +43,8 @@ baseKeyIndex F = -4
 baseKeyIndex Fis = -3
 baseKeyIndex G = -2
 baseKeyIndex Gis = -1
+
+keyPath (Key bk oct) = "./samples/" ++ (show $ bk) ++ (show $ oct) ++ ".wav"
 
 midiPitchToOctave midiPitch = quot (midiPitch - 12) 12
 midiPitchToBaseKey midiPitch = _midiPitchToBaseKey $ midiPitch `mod` 12
@@ -106,6 +112,7 @@ qwertzToKey c o = _int $ toLower c
             | 'o' == c = Key D (4 + o)
             | '0' == c = Key Dis (4 + o)
             | 'p' == c = Key E (4 + o)
+            | otherwise = NoKey
 
 qwertzToFreq :: Char -> Int -> Double -> Double
 qwertzToFreq char offset tuning = keyToFreq (qwertzToKey char offset) tuning

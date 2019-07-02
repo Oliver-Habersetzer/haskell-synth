@@ -5,6 +5,7 @@ import System.Console.CmdArgs
 import Instrument
 import Score
 import Render
+import Live
 import Utils
 import MidiConverter
 import System.IO
@@ -17,7 +18,7 @@ main = do
 runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender _ loop) = do
     putStrLn "Render mode"
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
-    
+
     -- convert midi to score if necessary
     if (isExts scorePath ["mid", "midi"]) then do
         putStrLn "Converting MIDI to score... "
@@ -34,9 +35,9 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode
 
 
 -- live mode
-runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ _ _) = do
+runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ defaultInstrument _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
-    putStrLn "Live mode"
+    live instruments defaultInstrument tuning stereoMode
 
 -- fail if path is empty
 nopath param [] = fail $ "No path for \"" ++ param ++ "\" specified"

@@ -1,5 +1,6 @@
 module Playback (
-    play
+    play,
+    loadSamples
 ) where
 
 import Control.Monad
@@ -15,6 +16,8 @@ waitPayback = do
             threadDelay 500000
             waitPayback
             
+loadSamples filenames = mapM (\filename -> sampleFromFile filename 1.0) filenames
+
 play filename loop = do
     -- max channels, mixing frequency, buffer size
     audioEngine <- initAudio 2 44100 1024
