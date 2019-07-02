@@ -7,7 +7,9 @@ module Key (
     qwertzToKey,
     qwertzToFreq,
     midiPitchToBaseKey,
-    midiPitchToOctave
+    baseKeys,
+    midiPitchToOctave,
+    keyPath
 ) where
 
 import GHC.Generics
@@ -26,6 +28,8 @@ data BaseKey = A | Ais | B | C | Cis | D | Dis | E | F | Fis | G | Gis deriving 
 instance FromJSON BaseKey
 instance ToJSON BaseKey
 
+baseKeys = [C, Cis, D, Dis, E, F, Fis, G, Gis, A, Ais, B]
+
 baseKeyIndex :: BaseKey -> Double
 baseKeyIndex A = 0
 baseKeyIndex Ais = 1
@@ -39,6 +43,8 @@ baseKeyIndex F = -4
 baseKeyIndex Fis = -3
 baseKeyIndex G = -2
 baseKeyIndex Gis = -1
+
+keyPath (Key bk oct) = "./samples/" ++ (show $ bk) ++ (show $ oct) ++ ".wav"
 
 midiPitchToOctave midiPitch = quot (midiPitch - 12) 12
 midiPitchToBaseKey midiPitch = _midiPitchToBaseKey $ midiPitch `mod` 12

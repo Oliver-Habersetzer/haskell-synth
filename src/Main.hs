@@ -35,9 +35,9 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode
 
 
 -- live mode
-runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ _ _) = do
+runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ defaultInstrument _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
-    live
+    live instruments defaultInstrument tuning stereoMode
 
 -- fail if path is empty
 nopath param [] = fail $ "No path for \"" ++ param ++ "\" specified"

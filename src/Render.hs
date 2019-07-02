@@ -1,7 +1,8 @@
 {-# LANGUAGE ParallelListComp #-}
 
 module Render (
-    render
+    render,
+    renderKey
 ) where
     
 import Instrument
@@ -17,6 +18,7 @@ import AppSettings
 import System.IO
 import Utils
 import Playback
+import Key
 
 clamp x
     | x < -1 = -1
@@ -62,6 +64,74 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
         toTime (fromIntegral eBr, fromIntegral eBt, fromIntegral eDv) bpm bpb dpb
     )
 
+renderKey osc key tuning = do
+    let freq = keyToFreq key tuning
+    let cycleCount = floor $ freq / 4 :: Integer
+    let cycleLength = 1.0 / freq
+    let _sampleCount = ceiling ((fromIntegral cycleCount) * cycleLength * 44100) :: Integer
+    let _baseTimes = baseTimes _sampleCount
+    let rendered = map (\x -> atPhase osc (x * freq) 0.5) _baseTimes
+    let outFileName = keyPath key
+    putStrLn $ outFileName
+    putStrLn $ "  Freq: " ++ (show freq) ++ " Hz"
+    putStrLn $ "  Cycle length: " ++ (show cycleLength) ++ " s"
+    putStrLn $ "  Cycle count: " ++ (show cycleCount)
+    putStrLn $ "  Sample count: " ++ (show _sampleCount)
+    putStr "Rendering... "
+    hFlush stdout
+    writeToWav outFileName 1 (channelToSamples rendered)
+    putStrLn "Done"
+
+baseTimes sampleCount = map (\s -> (fromIntegral s) / 44100.0) [0..sampleCount]
+
+writeToWav outputPath chC flatSamples = do
+        B.writeFile outputPath $ B.concat $
+                [
+                -- wave
+                -- magic number
+                encInt ("RIFF" :: String)
+
+                -- wave header
+                -- data length
+                , enc32E (0 :: Int32)
+                , encInt ("WAVE" :: String)
+
+                -- format header
+                -- magic number
+                , encInt ("fmt " :: String)
+                -- fmt header size
+                , enc32E (16 :: Int32)
+                -- +2B = 2B: PCM format
+                , enc16E (1 :: Int16)
+                -- +2B = 4B: channel count
+                , enc16E (chC :: Int16)
+                -- +4B = 8B: sample rate
+                , enc32E (44100 :: Int32)
+                -- +4B = 12B: byte rate
+                , enc32E (fromIntegral (44100 * fs) :: Int32)
+                -- +2B = 14B: block align
+                , enc16E (fromIntegral fs :: Int16)
+                -- +2B = 16B: bit per sample
+                , enc16E (bitPerSample :: Int16)
+
+                -- data block
+                -- magic number
+                , encInt ("data" :: String)
+                -- data size
+                , enc32E (fromIntegral (dataLen - 44) :: Int32)
+            ] ++ (map enc16E flatSamples)
+        where
+            encInt d = B.drop 8 $ encode d
+            enc16E d = BB.toLazyByteString $ BB.int16LE (d :: Int16)
+            enc32E d = BB.toLazyByteString $ BB.int32LE (d :: Int32)
+            fs = chC * (floor (((fromIntegral bitPerSample) + 7) / 8))
+            bitPerSample = 16
+            dataLen = (length flatSamples) * 2
+
+encInt d = B.drop 8 $ encode d
+
+channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
+
 render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender loop = do
     putStrLn "Render mode"
     putStr "Rendering... "
@@ -83,8 +153,7 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
     let _timedNotes = map (\n -> toTimedNote n (bpm) (fromIntegral bpb) (fromIntegral dpb)) _allNotes
     let _endTime = maximum $ map (\(_, _, _, _, _, et) -> et) _timedNotes
     let _sampleCount = round $ 44100 * _endTime :: Int
-    let _baseSamples = [0.._sampleCount]
-    let _baseTimes = map (\s -> (fromIntegral s) / 44100.0) _baseSamples
+    let _baseTimes = baseTimes _sampleCount
 
     -- render individual scores
     let _renderedScores = map (\s -> renderScore s _baseTimes) _scores
@@ -124,54 +193,12 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
                     channelToSamples (samples ++ n0s)
                 ]
                 where n0s = [0..(fromIntegral sd)] :: [Double]
-        channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
         renderToFile samples
-                | (isExt outputPath "wav") = do
-                    B.writeFile outputPath $ B.concat $
-                            [
-                            -- wave
-                            -- magic number
-                              encInt ("RIFF" :: String)
-
-                            -- wave header
-                            -- data length
-                            , enc32E (0 :: Int32)
-                            , encInt ("WAVE" :: String)
-
-                            -- format header
-                            -- magic number
-                            , encInt ("fmt " :: String)
-                            -- fmt header size
-                            , enc32E (16 :: Int32)
-                            -- +2B = 2B: PCM format
-                            , enc16E (1 :: Int16)
-                            -- +2B = 4B: channel count
-                            , enc16E (fromIntegral chC :: Int16)
-                            -- +4B = 8B: sample rate
-                            , enc32E (44100 :: Int32)
-                            -- +4B = 12B: byte rate
-                            , enc32E (fromIntegral (44100 * fs) :: Int32)
-                            -- +2B = 14B: block align
-                            , enc16E (fromIntegral fs :: Int16)
-                            -- +2B = 16B: bit per sample
-                            , enc16E (bitPerSample :: Int16)
-
-                            -- data block
-                            -- magic number
-                            , encInt ("data" :: String)
-                            -- data size
-                            , enc32E (fromIntegral (dataLen - 44) :: Int32)
-                        ] ++ (map enc16E flatSamples)
+                | (isExt outputPath "wav") = writeToWav outputPath (fromIntegral chC) flatSamples
                 | otherwise = B.writeFile outputPath (encInt flatSamples)
                 where
-                    enc16E d = BB.toLazyByteString $ BB.int16LE (d :: Int16)
-                    enc32E d = BB.toLazyByteString $ BB.int32LE (d :: Int32)
                     flatSamples = concat $ transpose samples :: [Int16]
                     chC = length samples
-                    fs = chC * (floor (((fromIntegral bitPerSample) + 7) / 8))
-                    bitPerSample = 16
-                    dataLen = (length flatSamples) * 2
-        encInt d = B.drop 8 $ encode d
         renderScore score baseTimes = do
             let _timedNotes = map (\n -> toTimedNote n (bpm) (fromIntegral bpb) (fromIntegral dpb)) (Render.notes score)
             let _renderedNotes = map (\t -> sum $ map (\n -> intersectingNote t n) _timedNotes) baseTimes
