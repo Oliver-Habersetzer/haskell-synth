@@ -1,6 +1,7 @@
 module Playback (
     play,
-    loadSamples
+    loadSamples,
+    playSampleLooping
 ) where
 
 import Control.Monad
@@ -17,6 +18,11 @@ waitPayback = do
             waitPayback
             
 loadSamples filenames = mapM (\filename -> sampleFromFile filename 1.0) filenames
+
+playSampleLooping sample = do 
+    soundLoop sample 1 1 0 1
+    waitPayback
+    finishAudio
 
 play filename loop = do
     -- max channels, mixing frequency, buffer size
