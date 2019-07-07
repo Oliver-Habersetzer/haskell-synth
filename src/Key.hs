@@ -28,6 +28,7 @@ data BaseKey = A | Ais | B | C | Cis | D | Dis | E | F | Fis | G | Gis deriving 
 instance FromJSON BaseKey
 instance ToJSON BaseKey
 
+baseKeys :: [BaseKey]
 baseKeys = [C, Cis, D, Dis, E, F, Fis, G, Gis, A, Ais, B]
 
 baseKeyIndex :: BaseKey -> Double
@@ -44,9 +45,13 @@ baseKeyIndex Fis = -3
 baseKeyIndex G = -2
 baseKeyIndex Gis = -1
 
+keyPath :: Key -> String
 keyPath (Key bk oct) = "./samples/" ++ (show $ bk) ++ (show $ oct) ++ ".wav"
 
+midiPitchToOctave :: Integral a => a -> a
 midiPitchToOctave midiPitch = quot (midiPitch - 12) 12
+
+midiPitchToBaseKey :: Integral a => a -> BaseKey
 midiPitchToBaseKey midiPitch = _midiPitchToBaseKey $ midiPitch `mod` 12
         where
                 _midiPitchToBaseKey 9 = A

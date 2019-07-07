@@ -11,8 +11,11 @@ import MidiConverter
 import System.IO
 
 -- parse cli arguments
+main :: IO ()
 main = do
     runApp =<< cmdArgs appSettings
+
+runApp :: AppSettings -> IO ()
 
 -- render mode
 runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode delaySamples playAfterRender _ loop) = do
@@ -33,12 +36,12 @@ runApp (AppSettings Render tuning intsrumentPath scorePath outputPath stereoMode
         scores <- readScores $ nopath "score" scorePath
         render instruments scores tuning outputPath stereoMode delaySamples playAfterRender loop
 
-
 -- live mode
 runApp (AppSettings Live tuning intsrumentPath _ _ stereoMode delaySamples _ defaultInstrument _) = do
     instruments <- readInstruments $ nopath "instrument" intsrumentPath
     live instruments defaultInstrument tuning stereoMode
 
 -- fail if path is empty
+nopath :: [Char] -> [a] -> [a]
 nopath param [] = fail $ "No path for \"" ++ param ++ "\" specified"
 nopath param str = str

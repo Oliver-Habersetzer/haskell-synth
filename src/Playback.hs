@@ -11,19 +11,23 @@ import qualified Data.ByteString as SB
 import Control.Concurrent
 import Sound.ProteaAudio
 
-waitPayback = do
+waitPlayback :: IO ()
+waitPlayback = do
     n <- soundActive
     when  (n > 0) $ do
             threadDelay 500000
-            waitPayback
+            waitPlayback
             
+loadSamples :: Traversable t => t String -> IO (t Sound.ProteaAudio.Sample)
 loadSamples filenames = mapM (\filename -> sampleFromFile filename 1.0) filenames
 
+playSampleLooping :: Sound.ProteaAudio.Sample -> IO ()
 playSampleLooping sample = do 
     soundLoop sample 1 1 0 1
-    waitPayback
+    waitPlayback
     finishAudio
 
+play :: String -> Bool -> IO ()
 play filename loop = do
     -- max channels, mixing frequency, buffer size
     audioEngine <- initAudio 2 44100 1024
@@ -33,9 +37,9 @@ play filename loop = do
     -- left volume, right volume, time difference between left and right, pitch factor for playback
     if loop then do
         soundLoop sample 1 1 0 1
-        waitPayback
+        waitPlayback
         finishAudio
     else do
         soundPlay sample 1 1 0 1
-        waitPayback
+        waitPlayback
         finishAudio

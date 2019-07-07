@@ -64,6 +64,7 @@ toTimedNote (InternalNote sF eF sV eV sBr eBr sBt eBt sDv eDv) bpm bpb dpb = (
         toTime (fromIntegral eBr, fromIntegral eBt, fromIntegral eDv) bpm bpb dpb
     )
 
+renderKey :: Oscilator -> Key -> Double -> IO ()
 renderKey osc key tuning = do
     let freq = keyToFreq key tuning
     let cycleCount = floor $ freq / 4 :: Integer
@@ -132,6 +133,8 @@ encInt d = B.drop 8 $ encode d
 
 channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
 
+render :: Integral t => [Instrument] -> Scores -> Double
+    -> [Char] -> TwoChannelMode -> t -> Bool -> Bool -> IO ()
 render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender loop = do
     putStrLn "Render mode"
     putStr "Rendering... "
