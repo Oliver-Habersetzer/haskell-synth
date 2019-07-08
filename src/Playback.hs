@@ -1,7 +1,9 @@
 module Playback (
     play,
     loadSamples,
-    playSampleLooping
+    playSample,
+    initPlayback,
+    finishPlayback
 ) where
 
 import Control.Monad
@@ -21,25 +23,27 @@ waitPlayback = do
 loadSamples :: Traversable t => t String -> IO (t Sound.ProteaAudio.Sample)
 loadSamples filenames = mapM (\filename -> sampleFromFile filename 1.0) filenames
 
-playSampleLooping :: Sound.ProteaAudio.Sample -> IO ()
-playSampleLooping sample = do 
-    soundLoop sample 1 1 0 1
-    waitPlayback
-    finishAudio
+playSample :: Sound.ProteaAudio.Sample -> Bool -> IO ()
+playSample sample loop = do 
+    if loop then do
+        soundLoop sample 1 1 0 1
+        waitPlayback
+    else do
+        soundPlay sample 1 1 0 1
+        waitPlayback
+
+initPlayback = do
+    audioEngine <- initAudio 2 44100 1024
+    unless audioEngine $ error "Failed to initialize the audio system"
+
+finishPlayback = finishAudio
 
 play :: String -> Bool -> IO ()
 play filename loop = do
     -- max channels, mixing frequency, buffer size
-    audioEngine <- initAudio 2 44100 1024
-    unless audioEngine $ error "Failed to initialize the audio system"
+    initPlayback
     -- load sample from file
     sample <- sampleFromFile filename 1.0
     -- left volume, right volume, time difference between left and right, pitch factor for playback
-    if loop then do
-        soundLoop sample 1 1 0 1
-        waitPlayback
-        finishAudio
-    else do
-        soundPlay sample 1 1 0 1
-        waitPlayback
-        finishAudio
+    playSample sample loop
+    finishAudio

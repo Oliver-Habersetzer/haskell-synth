@@ -41,7 +41,10 @@ live instruments defaultInstrument tuning stereoMode = do
         putStrLn $ "Selected oscilator: " ++ (show osc)
         createDirectoryIfMissing True "./samples"
         mapM_ (\k -> renderKey osc k tuning) keys
+        initPlayback
         samples <- loadSamples $ map keyPath keys
+        -- debug only: play all samples
+        -- mapM_ (\s -> playSample s False) samples
 
         initGUI
         window <- windowNew
