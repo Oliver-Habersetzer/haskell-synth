@@ -147,7 +147,6 @@ convertMidiToScoreFile inPath outPath = do
         getInstrumentNames 0 c = return []
         getInstrumentNames n c = do 
             putStr $ "Instrument name for channel " ++ (show (1 + c - n)) ++ ": "
-            hFlush stdout
             input <- getLine
             moreinputs <- getInstrumentNames (n - 1) c
             return (input : moreinputs)

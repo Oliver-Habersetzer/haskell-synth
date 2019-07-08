@@ -13,6 +13,7 @@ import System.IO
 -- parse cli arguments
 main :: IO ()
 main = do
+    hSetBuffering stdout NoBuffering
     runApp =<< cmdArgs appSettings
 
 runApp :: AppSettings -> IO ()
