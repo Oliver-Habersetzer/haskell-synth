@@ -15,6 +15,7 @@ import Instrument
 import Oscilators
 import System.Directory
 import Playback
+import Control.Concurrent
 
 keyConv key = do
     let keyString = safeKeyString $ glibToString key
@@ -43,8 +44,21 @@ live instruments defaultInstrument tuning stereoMode = do
         mapM_ (\k -> renderKey osc k tuning) keys
         initPlayback
         samples <- loadSamples $ map keyPath keys
-        -- debug only: play all samples
-        -- mapM_ (\s -> playSample s False) samples
+        -- test: play all samples
+        -- mapM_ (\s -> playSample s False True) samples
+
+        {-
+        -- test: playback in multiple threads
+        tid1 <- forkIO (do 
+                playSample (samples !! 48) True False
+            )
+        tid2 <- forkIO (do 
+                playSample (samples !! 52) True False
+            )
+        tid3 <- forkIO (do 
+                playSample (samples !! 55) True False
+            )
+        -}
 
         initGUI
         window <- windowNew
