@@ -113,11 +113,11 @@ qwertzToKey c o = _int $ toLower c
             | '7' == c = Key Ais (5 + o)
             | 'u' == c = Key B (5 + o)
             -- oct 6 + o
-            | 'i' == c = Key C (4 + o)
-            | '9' == c = Key Cis (4 + o)
-            | 'o' == c = Key D (4 + o)
-            | '0' == c = Key Dis (4 + o)
-            | 'p' == c = Key E (4 + o)
+            | 'i' == c = Key C (6 + o)
+            | '9' == c = Key Cis (6 + o)
+            | 'o' == c = Key D (6 + o)
+            | '0' == c = Key Dis (6 + o)
+            | 'p' == c = Key E (6 + o)
             | otherwise = NoKey
 
 qwertzToFreq :: Char -> Int -> Double -> Double
