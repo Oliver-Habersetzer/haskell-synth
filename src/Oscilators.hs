@@ -26,12 +26,12 @@ atPhase :: Oscilator -> Double -> Double -> Double
 
 -- wavetable
 atPhase (WavetableOsc samples) phase amplitude = do
-    let _samples = (samples) ++ [(samples) !! 0] :: [Double]
-    let _phase = (phase - (fromIntegral (floor phase))) :: Double
-    let scaled = _phase * (fromIntegral (length $ samples)) :: Double
-    let weight = (scaled - (fromIntegral (floor scaled))) :: Double
-    let a = _samples !! (floor scaled) :: Double
-    let b = _samples !! (ceiling scaled) :: Double
+    let _samples = (samples) ++ [(samples) !! 0]
+    let _phase = decOnly phase
+    let scaled = _phase * (fromIntegral $ length samples)
+    let weight = decOnly scaled
+    let a = _samples !! (floor scaled)
+    let b = _samples !! (ceiling scaled)
     amplitude * ((1 - weight) * a + weight * b)
 
 atPhase TriangleOsc phase amplitude =
