@@ -9,7 +9,8 @@ module Key (
     midiPitchToBaseKey,
     baseKeys,
     midiPitchToOctave,
-    keyPath
+    keyPath,
+    baseKeyIndex
 ) where
 
 import GHC.Generics
