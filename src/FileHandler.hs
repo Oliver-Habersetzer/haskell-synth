@@ -19,9 +19,9 @@ saveNote key = do
         file <- openFile "src/.tmp" AppendMode
         hPutStrLn file $ remstr $ show key
         hClose file
-        return ()
+        return (True)
     else
-      return ()
+      return (False)
 
 --deleteNote :: [Char] -> IO ()
 deleteNote key = do

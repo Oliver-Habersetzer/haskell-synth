@@ -98,8 +98,11 @@ live instruments defaultInstrument tuning stereoMode = do
             let i = keyToIndex k
             case i of
                 Just _i -> do
-                  liftIO $ saveNote $ show _i
-                  liftIO $ playSample (samples !! _i) True False
+                  bool <- liftIO $ saveNote $ show _i
+                  if bool
+                    then
+                      liftIO $ playSample (samples !! _i) True False
+                    else return ()
                 Nothing -> return ()
             return ()
 
