@@ -3,7 +3,8 @@ module Playback (
     loadSamples,
     playSample,
     initPlayback,
-    finishPlayback
+    finishPlayback,
+    stopSamples
 ) where
 
 import Control.Monad
@@ -35,8 +36,10 @@ playSample sample loop wait = do
         return ()
 
 initPlayback = do
-    audioEngine <- initAudio 1024 44100 1024
+    audioEngine <- initAudio 1024 44100 32
     unless audioEngine $ error "Failed to initialize the audio system"
+
+stopSamples = soundStopAll
 
 finishPlayback = finishAudio
 
