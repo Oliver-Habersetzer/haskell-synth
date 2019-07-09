@@ -5,7 +5,6 @@ module FileHandler (
 ) where
 
 import System.IO
-import System.Directory
 import Control.Concurrent
 import Data.List.Split
 import Key
@@ -16,7 +15,7 @@ saveNote key = do
   if  (not bool)
     then
       do
-        file <- openFile "src/.tmp" AppendMode
+        file <- openFile "./.hs-synth-tmp" AppendMode
         hPutStrLn file $ remstr $ show key
         hClose file
         return (True)
@@ -25,12 +24,12 @@ saveNote key = do
 
 --deleteNote :: [Char] -> IO ()
 deleteNote key = do
-  file <- openFile "src/.tmp" ReadMode
+  file <- openFile "./.hs-synth-tmp" ReadMode
   input <- loop file key []
   let split = splitOn "/" input
   hClose file
-  writeFile "src/.tmp" ""
-  file <- openFile "src/.tmp" WriteMode
+  writeFile "./.hs-synth-tmp" ""
+  file <- openFile "./.hs-synth-tmp" WriteMode
   mapM_ (hPutStrLn file) (filter (\x -> not (x == "")) split)
   hClose file
   return ()
@@ -69,7 +68,7 @@ remstr [] = []
 remstr (x:xs) = if x == '"' then remstr xs else x:remstr xs
 
 checkNote key = do
-  file <- openFile "src/.tmp" ReadMode
+  file <- openFile "./.hs-synth-tmp" ReadMode
   bool <- checkFile file key
   hClose file
   if (bool)
@@ -77,7 +76,7 @@ checkNote key = do
     else return False
 
 getTMP = do
-  file <- openFile "src/.tmp" ReadMode
+  file <- openFile "./.hs-synth-tmp" ReadMode
   list <- getSamples file []
   hClose file
   return (list)
