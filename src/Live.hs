@@ -26,6 +26,10 @@ keyConv key = do
     else do
         NoKey
 
+keyToIndex :: Key -> Maybe Int
+keyToIndex (Key bk oct) = Just $ fromIntegral $ floor (fromIntegral oct * 12 + (baseKeyIndex bk) + 9)
+keyToIndex _ = Nothing
+
 safeKeyString str
         | str == "comma" = ","
         | str == "period" = "."
@@ -73,13 +77,21 @@ live instruments defaultInstrument tuning stereoMode = do
         
         window `on` keyReleaseEvent $ tryEvent $ do
             key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
-            let x = keyConv key
-            liftIO $ putStrLn (show x ++ " released")
+            let k = keyConv key
+            let i = keyToIndex k
+            case i of
+                Just _i -> liftIO $ stopSamples
+                Nothing -> return ()
+            return ()
 
         window `on` keyPressEvent $ tryEvent $ do
             key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
-            let x = keyConv key
-            liftIO $ putStrLn (show x ++ " pressed")
+            let k = keyConv key
+            let i = keyToIndex k
+            case i of
+                Just _i -> liftIO $ playSample (samples !! _i) True False
+                Nothing -> return ()
+            return ()
 
         widgetShowAll window
         mainGUI
