@@ -9,6 +9,7 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Gdk.EventM
 import System.Glib.UTFString
 import Data.Char
+import FileHandler
 import Key
 import Render
 import Instrument
@@ -16,6 +17,7 @@ import Oscilators
 import System.Directory
 import Playback
 import Control.Concurrent
+import Data.Typeable
 
 keyConv key = do
     let keyString = safeKeyString $ glibToString key
@@ -53,13 +55,13 @@ live instruments defaultInstrument tuning stereoMode = do
 
         {-
         -- test: playback in multiple threads
-        tid1 <- forkIO (do 
+        tid1 <- forkIO (do
                 playSample (samples !! 48) True False
             )
-        tid2 <- forkIO (do 
+        tid2 <- forkIO (do
                 playSample (samples !! 52) True False
             )
-        tid3 <- forkIO (do 
+        tid3 <- forkIO (do
                 playSample (samples !! 55) True False
             )
         -}
@@ -68,19 +70,25 @@ live instruments defaultInstrument tuning stereoMode = do
         window <- windowNew
         set window [  windowTitle         := "Synthi"
                     , windowResizable     := False ]
-        
+
         window `on` deleteEvent $ liftIO mainQuit >> return False
         image <- imageNewFromFile "./resources/qwertz-layout.png"
         containerAdd window image
         widgetShowAll window
         windowSetKeepAbove window True
-        
+
         window `on` keyReleaseEvent $ tryEvent $ do
             key <- Graphics.UI.Gtk.Gdk.EventM.eventKeyName
             let k = keyConv key
             let i = keyToIndex k
             case i of
-                Just _i -> liftIO $ stopSamples
+                Just _i -> do
+                  liftIO $ deleteNote $ show _i
+                  sampleList <- liftIO getTMP
+                  liftIO $ stopSamples
+                  let sample = map (read :: String -> Int) sampleList
+                  mapM_ (\x -> liftIO $ playSample (samples !! x ) True False ) sample
+                  return ()
                 Nothing -> return ()
             return ()
 
@@ -89,7 +97,9 @@ live instruments defaultInstrument tuning stereoMode = do
             let k = keyConv key
             let i = keyToIndex k
             case i of
-                Just _i -> liftIO $ playSample (samples !! _i) True False
+                Just _i -> do
+                  liftIO $ saveNote $ show _i
+                  liftIO $ playSample (samples !! _i) True False
                 Nothing -> return ()
             return ()
 

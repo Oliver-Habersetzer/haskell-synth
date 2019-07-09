@@ -1,6 +1,7 @@
 module FileHandler (
   saveNote,
-  deleteNote
+  deleteNote,
+  getTMP
 ) where
 
 import System.IO
@@ -8,14 +9,14 @@ import System.Directory
 import Control.Concurrent
 import Data.List.Split
 import Key
-
+import Data.Typeable
 --saveNote :: Key -> IO ()
 saveNote key = do
   bool <- checkNote key
   if  (not bool)
     then
       do
-        file <- openFile ".tmp" AppendMode
+        file <- openFile "src/.tmp" AppendMode
         hPutStrLn file $ remstr $ show key
         hClose file
         return ()
@@ -24,13 +25,13 @@ saveNote key = do
 
 --deleteNote :: [Char] -> IO ()
 deleteNote key = do
-  file <- openFile ".tmp" ReadMode
+  file <- openFile "src/.tmp" ReadMode
   input <- loop file key []
   let split = splitOn "/" input
   hClose file
-  writeFile ".tmp" ""
-  file <- openFile ".tmp" WriteMode
-  mapM_ (hPutStrLn file) split
+  writeFile "src/.tmp" ""
+  file <- openFile "src/.tmp" WriteMode
+  mapM_ (hPutStrLn file) (filter (\x -> not (x == "")) split)
   hClose file
   return ()
 
@@ -68,26 +69,23 @@ remstr [] = []
 remstr (x:xs) = if x == '"' then remstr xs else x:remstr xs
 
 checkNote key = do
-  file <- openFile ".tmp" ReadMode
+  file <- openFile "src/.tmp" ReadMode
   bool <- checkFile file key
   hClose file
   if (bool)
     then return True
     else return False
 
+getTMP = do
+  file <- openFile "src/.tmp" ReadMode
+  list <- getSamples file []
+  hClose file
+  return (list)
 
-test :: [Char] -> IO ()
-test key = do
-  print $ "Ich bin geforked von " ++ key
-  file <- openFile ".tmp" ReadMode
-  content <- hGetContents file
-  if(elem key $ splitOn "\n" $ remstr content)
-    then
-      do
-        threadDelay 10000000
-        test key
-    else
-      do
-        threadID <- myThreadId
-        hClose file
-        killThread threadID
+getSamples file list = do
+  bool <- hIsEOF file
+  if bool
+    then return (list)
+    else do
+      nextEle <- hGetLine file
+      getSamples file $ nextEle:list
