@@ -79,7 +79,6 @@ renderKey osc key tuning = do
     putStrLn $ "  Cycle count: " ++ (show cycleCount)
     putStrLn $ "  Sample count: " ++ (show _sampleCount)
     putStr "Rendering... "
-    hFlush stdout
     writeToWav outFileName 1 (channelToSamples rendered)
     putStrLn "Done"
 
@@ -138,7 +137,6 @@ render :: Integral t => [Instrument] -> Scores -> Double
 render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoMode stereoDelay playAfterRender loop = do
     putStrLn "Render mode"
     putStr "Rendering... "
-    hFlush stdout
 
     -- convert input data to internal format
     let track = InternalTrack bpm bpb dpb 

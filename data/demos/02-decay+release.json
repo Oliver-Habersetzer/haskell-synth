@@ -61,13 +61,45 @@
                 {
                     "key": "C",
                     "octave": 4, 
+                    "start": "0.2.0",
+                    "end": "0.2.1",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "E",
+                    "octave": 4, 
+                    "start": "0.2.1",
+                    "end": "0.2.2",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "G",
+                    "octave": 4, 
+                    "start": "0.2.2",
+                    "end": "0.2.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "B",
+                    "octave": 4, 
+                    "start": "0.2.3",
+                    "end": "0.3.0",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 5, 
                     "start": "0.3.0",
                     "end": "0.3.1",
                     "vol": 1,
                     "endVol": 0
                 },
                 {
-                    "key": "E",
+                    "key": "B",
                     "octave": 4, 
                     "start": "0.3.1",
                     "end": "0.3.2",
@@ -75,42 +107,10 @@
                     "endVol": 0
                 },
                 {
-                    "key": "G",
-                    "octave": 4, 
-                    "start": "0.3.2",
-                    "end": "0.3.3",
-                    "vol": 1,
-                    "endVol": 0
-                },
-                {
-                    "key": "B",
-                    "octave": 4, 
-                    "start": "0.3.3",
-                    "end": "0.4.0",
-                    "vol": 1,
-                    "endVol": 0
-                },
-                {
-                    "key": "C",
-                    "octave": 5, 
-                    "start": "0.4.0",
-                    "end": "0.4.1",
-                    "vol": 1,
-                    "endVol": 0
-                },
-                {
-                    "key": "B",
-                    "octave": 4, 
-                    "start": "0.4.1",
-                    "end": "0.4.2",
-                    "vol": 1,
-                    "endVol": 0
-                },
-                {
                     "key": "E",
                     "octave": 4, 
-                    "start": "0.4.2",
-                    "end": "0.5.0",
+                    "start": "0.3.2",
+                    "end": "0.4.0",
                     "vol": 1,
                     "endVol": 0
                 }
