@@ -11,11 +11,16 @@ import Key
 
 --saveNote :: Key -> IO ()
 saveNote key = do
-  file <- openFile ".tmp" AppendMode
-  hPutStrLn file $ remstr $ show key
-  hClose file
-  --forkIO $ test key
-  return ()
+  bool <- checkNote key
+  if  (not bool)
+    then
+      do
+        file <- openFile ".tmp" AppendMode
+        hPutStrLn file $ remstr $ show key
+        hClose file
+        return ()
+    else
+      return ()
 
 --deleteNote :: [Char] -> IO ()
 deleteNote key = do
@@ -43,9 +48,33 @@ loop file key list = do
           then loop file key list
           else loop file key ( list ++ removed ++ "/")
 
+
+checkFile file key =
+  do
+  bool <- hIsEOF file
+  if bool
+    then return False
+    else
+      do
+        input <- hGetLine file
+        let removed = remstr input
+        if removed == key
+          then return True
+          else checkFile file key
+
+
 --remstr :: [Char] -> [Char]
 remstr [] = []
 remstr (x:xs) = if x == '"' then remstr xs else x:remstr xs
+
+checkNote key = do
+  file <- openFile ".tmp" ReadMode
+  bool <- checkFile file key
+  hClose file
+  if (bool)
+    then return True
+    else return False
+
 
 test :: [Char] -> IO ()
 test key = do
