@@ -8,6 +8,9 @@ module Oscilators (
 
 import GHC.Generics
 import Instrument
+import Data.Fixed
+
+decOnly v = (mod' v 1)
 
 data Oscilator
     = SilentOsc
@@ -23,32 +26,32 @@ atPhase :: Oscilator -> Double -> Double -> Double
 
 -- wavetable
 atPhase (WavetableOsc samples) phase amplitude = do
-    let _samples = (samples) ++ [(samples) !! 0] :: [Double]
-    let _phase = (phase - (fromIntegral (floor phase))) :: Double
-    let scaled = _phase * (fromIntegral (length $ samples)) :: Double
-    let weight = (scaled - (fromIntegral (floor scaled))) :: Double
-    let a = _samples !! (floor scaled) :: Double
-    let b = _samples !! (ceiling scaled) :: Double
+    let _samples = (samples) ++ [(samples) !! 0]
+    let _phase = decOnly phase
+    let scaled = _phase * (fromIntegral $ length samples)
+    let weight = decOnly scaled
+    let a = _samples !! (floor scaled)
+    let b = _samples !! (ceiling scaled)
     amplitude * ((1 - weight) * a + weight * b)
 
 atPhase TriangleOsc phase amplitude =
-    amplitude * (sawToTriangle (phase - (fromIntegral (floor phase))))
+    amplitude * (sawToTriangle (decOnly phase))
     where sawToTriangle p
             | p <= 0.25 = p * 4
             | p <= 0.75 = 1 - ((p - 0.25) * (4))
             | otherwise = (p - 0.75) * 4 - 1
 
 atPhase SquareOsc phase amplitude =
-    amplitude * _square (phase - (fromIntegral (floor phase)))
+    amplitude * _square (decOnly phase)
     where _square v
             | v < 0.5 = 1
             | otherwise = -1
 
 atPhase SineOsc phase amplitude =
-    amplitude * (sin (phase * 2 * pi)) * 2
+    amplitude * (sin (phase * 2 * pi))
 
 atPhase SawOsc phase amplitude =
-    amplitude * ((2 * (phase - (fromIntegral (floor phase))) - 1))
+    amplitude * ((2 * (decOnly phase) - 1))
 
 atPhase NoiseOsc phase amplitude =
     atPhase (WavetableOsc _samples) phase amplitude
