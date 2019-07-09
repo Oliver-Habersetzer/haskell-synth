@@ -1,6 +1,6 @@
-module Filehandler (
-saveNote,
-deleteNote
+module FileHandler (
+  saveNote,
+  deleteNote
 ) where
 
 import System.IO
