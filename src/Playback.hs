@@ -36,7 +36,7 @@ playSample sample loop wait = do
         return ()
 
 initPlayback = do
-    audioEngine <- initAudio 1024 44100 32
+    audioEngine <- initAudio 1024 44100 1
     unless audioEngine $ error "Failed to initialize the audio system"
 
 stopSamples = soundStopAll
