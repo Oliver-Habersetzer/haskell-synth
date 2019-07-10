@@ -4,7 +4,7 @@ module Render (
     render,
     renderKey
 ) where
-    
+
 import Instrument
 import Oscilators
 import Score
@@ -20,13 +20,16 @@ import Utils
 import Playback
 import Key
 
+clamp :: (Ord p, Num p) => p -> p
 clamp x
     | x < -1 = -1
     | x > 1 = 1
     | otherwise = x
 
+sigmoid :: Floating a => a -> a
 sigmoid x = 2.0 / (1.0 + exp (negate x)) - 1.0
 
+--remap :: Fractional a => a -> a -> a -> a -> a -> a
 remap x in_min in_max out_min out_max = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 data InternalTrack = InternalTrack {
@@ -82,8 +85,10 @@ renderKey osc key tuning = do
     writeToWav outFileName 1 (channelToSamples rendered)
     putStrLn "Done"
 
+baseTimes :: (Fractional b, Integral a) => a -> [b]
 baseTimes sampleCount = map (\s -> (fromIntegral s) / 44100.0) [0..sampleCount]
 
+writeToWav :: FilePath -> Int16 -> [Int16] -> IO ()
 writeToWav outputPath chC flatSamples = do
         B.writeFile outputPath $ B.concat $
                 [
@@ -128,8 +133,10 @@ writeToWav outputPath chC flatSamples = do
             bitPerSample = 16
             dataLen = (length flatSamples) * 2
 
+encInt :: Binary a => a -> B.ByteString
 encInt d = B.drop 8 $ encode d
 
+channelToSamples :: RealFrac a => [a] -> [Int16]
 channelToSamples samples = map (\s -> floor (remap s (-1.0) 1.0 (fromIntegral (minBound::Int16)) (fromIntegral (maxBound::Int16)))) samples :: [Int16]
 
 render :: Integral t => [Instrument] -> Scores -> Double
@@ -139,7 +146,7 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
     putStr "Rendering... "
 
     -- convert input data to internal format
-    let track = InternalTrack bpm bpb dpb 
+    let track = InternalTrack bpm bpb dpb
             [
                 InternalScore sName (map (\n -> toInternalNote n tuning) notes) scoreFx (fromInstrument instrument)
             |
@@ -179,8 +186,8 @@ render instruments (Scores bpm bpb dpb trackFx scores) tuning outputPath stereoM
             fail "Can't play back raw files but rendering was completed."
     else do
         putStrLn "Done"
-    
-    where 
+
+    where
         trackToSamples Mono _ samples
                 = [channelToSamples samples]
         trackToSamples Invert _ samples

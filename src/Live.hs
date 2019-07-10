@@ -19,6 +19,7 @@ import Playback
 import Control.Concurrent
 import Data.Typeable
 
+--keyConv :: Data.Text.Internal.Text -> Key
 keyConv key = do
     let keyString = safeKeyString $ glibToString key
     if (length keyString) == 1 then do
@@ -37,7 +38,7 @@ safeKeyString str
         | str == "period" = "."
         | str == "minus" = "-"
         | otherwise = str
-
+live :: [Instrument] -> [Char] -> Double -> p -> IO ()
 live instruments defaultInstrument tuning stereoMode = do
     let filteredInstruments = filter (\(Instrument name _ _ ) -> name == defaultInstrument) instruments
     if (length filteredInstruments) == 0 then do

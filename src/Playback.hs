@@ -20,12 +20,12 @@ waitPlayback = do
     when  (n > 0) $ do
             threadDelay 500000
             waitPlayback
-            
+
 loadSamples :: Traversable t => t String -> IO (t Sound.ProteaAudio.Sample)
 loadSamples filenames = mapM (\filename -> sampleFromFile filename 1.0) filenames
 
 playSample :: Sound.ProteaAudio.Sample -> Bool -> Bool -> IO ()
-playSample sample loop wait = do 
+playSample sample loop wait = do
     if loop then do
         soundLoop sample 1 1 0 1
     else do
@@ -35,12 +35,15 @@ playSample sample loop wait = do
     else do
         return ()
 
+initPlayback :: IO ()
 initPlayback = do
-    audioEngine <- initAudio 1024 44100 32
+    audioEngine <- initAudio 128 44100 4
     unless audioEngine $ error "Failed to initialize the audio system"
 
+stopSamples :: IO ()
 stopSamples = soundStopAll
 
+finishPlayback :: IO ()
 finishPlayback = finishAudio
 
 play :: String -> Bool -> IO ()
