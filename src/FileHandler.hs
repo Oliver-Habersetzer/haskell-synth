@@ -9,7 +9,8 @@ import Control.Concurrent
 import Data.List.Split
 import Key
 import Data.Typeable
---saveNote :: Key -> IO ()
+
+saveNote :: [Char] -> IO (Bool)
 saveNote key = do
   bool <- checkNote key
   if  (not bool)
@@ -22,7 +23,7 @@ saveNote key = do
     else
       return (False)
 
---deleteNote :: [Char] -> IO ()
+deleteNote :: [Char] -> IO ()
 deleteNote key = do
   file <- openFile "./.hs-synth-tmp" ReadMode
   input <- loop file key []
@@ -35,7 +36,7 @@ deleteNote key = do
   return ()
 
 
---loop :: Handle -> Key -> [Char] ->  IO ([Char])
+loop :: Handle -> [Char] -> [Char] ->  IO ([Char])
 loop file key list = do
   bool <- hIsEOF file
   if bool
@@ -48,7 +49,7 @@ loop file key list = do
           then loop file key list
           else loop file key ( list ++ removed ++ "/")
 
-
+checkFile :: Handle -> [Char] -> IO (Bool)
 checkFile file key =
   do
   bool <- hIsEOF file
@@ -63,7 +64,7 @@ checkFile file key =
           else checkFile file key
 
 
---remstr :: [Char] -> [Char]
+remstr :: [Char] -> [Char]
 remstr [] = []
 remstr (x:xs) = if x == '"' then remstr xs else x:remstr xs
 
@@ -75,12 +76,14 @@ checkNote key = do
     then return True
     else return False
 
+getTMP :: IO [String]
 getTMP = do
   file <- openFile "./.hs-synth-tmp" ReadMode
   list <- getSamples file []
   hClose file
   return (list)
 
+getSamples :: Handle -> [String] -> IO ([String])
 getSamples file list = do
   bool <- hIsEOF file
   if bool
