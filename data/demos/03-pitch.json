@@ -1,0 +1,96 @@
+{
+    "beatsPerMinute": 140,
+    "beatsPerBar": 4,
+    "divisionsPerBeat": 8,
+    "trackFx": [],
+    "scores": [
+        {
+            "instrumentName": "saw",
+            "scoreFx": [],
+            "notes": [
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "0.0.0",
+                    "end": "0.0.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "0.1.0",
+                    "end": "0.1.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "0.2.0",
+                    "end": "0.2.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "0.3.0",
+                    "end": "0.3.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "1.0.0",
+                    "end": "1.0.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "1.1.0",
+                    "end": "1.1.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "1.2.0",
+                    "end": "1.2.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "1.3.0",
+                    "end": "1.3.3",
+                    "vol": 1,
+                    "endVol": 0
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "endOctave": 1, 
+                    "start": "1.3.0",
+                    "end": "2.0.0",
+                    "vol": 0,
+                    "endVol": 0
+                }
+            ]
+        }
+    ]
+}

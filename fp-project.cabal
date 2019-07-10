@@ -26,6 +26,7 @@ executable fp-project
                      , directory
                      , proteaaudio
                      , filepath
+                     , mtl
   default-language:    Haskell2010
   hs-source-dirs:      src
                      , src/oscilators
@@ -40,6 +41,7 @@ executable fp-project
                      , Utils
                      , MidiConverter
                      , Playback
+                     , FileHandler
 
 test-suite test
   type:             exitcode-stdio-1.0

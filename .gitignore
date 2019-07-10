@@ -5,3 +5,4 @@ dist**
 **.raw
 midi/
 .idea
+.hs-synth-tmp

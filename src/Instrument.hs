@@ -25,6 +25,7 @@ readInstruments path = do
     where mbV (Just a) = a
           mbV (Nothing) = error $ "Could not parse " ++ path ++ " to instruments"
 
+baseInstruments :: [Instrument]
 baseInstruments = [bo si, bo sa, bo sq, bo tr]
     where
         bo osc = Instrument osc osc Nothing

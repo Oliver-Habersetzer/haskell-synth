@@ -23,7 +23,10 @@ data NoteAction = On | Off deriving Show
 MIDI-tempo / time signature: http://www.deluge.co/?q=midi-tempo-bpm
 -}
 
+fst3 :: (a, b, c) -> a
 fst3 (v, _, _) = v
+
+snd3 :: (a, b, c) -> b
 snd3 (_, v, _) = v
 
 convertMidiToScoreFile :: String -> String -> IO Scores
@@ -122,7 +125,6 @@ convertMidiToScoreFile inPath outPath = do
                 else
                         findFirstMatchingOff (startTime, targetChannel, On, targetNote, volume) xs
 
-
         isOn On = True
         isOn Off = False
         eventIsOn (_, _, onOff, _, _) = isOn onOff
@@ -145,12 +147,10 @@ convertMidiToScoreFile inPath outPath = do
         getInstrumentNames 0 c = return []
         getInstrumentNames n c = do 
             putStr $ "Instrument name for channel " ++ (show (1 + c - n)) ++ ": "
-            hFlush stdout
             input <- getLine
             moreinputs <- getInstrumentNames (n - 1) c
             return (input : moreinputs)
     
-
         filterEmptyTracks (Nothing, Nothing, []) = False
         filterEmptyTracks _ = True
 
@@ -174,22 +174,8 @@ convertMidiToScoreFile inPath outPath = do
                     $ map (\(t, b) -> (t, getNoteEvent b)) 
                     $ filter (\(t, b) -> isNoteEvent b)
                     zippedEvents
-            
-            {-
-            putStrLn $ "    Track:"
-            putStrLn $ "      Track times / bodies: [" ++ (show $ length bodies) ++ "]"
-            putStrLn $ "      Meta only bodies: " ++ (show metaOnlyBodies)
-            onJust timeSig (\(timeSig) -> putStrLn $ "      Time signature: " ++ (show timeSig))
-            onJust setTempo (\(setTempo) -> putStrLn $ "      Set tempo: " ++ (show setTempo))
-            if metaOnlyBodies then
-                mapM_ (\body -> putStrLn $ "        Body: " ++ (show body)) bodies
-            else
-                putStrLn "        [...]"
-            putStrLn $ "      Note events: " ++ (show $ length noteEvents)
-            putStrLn $ "        " ++ (show noteEvents)
 
-            -}
-
+            -- return
             (timeSig, setTempo, noteEvents)
 
         getTimeSig (Event.MetaEvent (MetaEvent.TimeSig n d c b)) = (n, d, c, b)

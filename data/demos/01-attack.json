@@ -1,0 +1,62 @@
+{
+    "beatsPerMinute": 140,
+    "beatsPerBar": 4,
+    "divisionsPerBeat": 4,
+    "trackFx": [],
+    "scores": [
+        {
+            "instrumentName": "saw",
+            "scoreFx": [],
+            "notes": [
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "start": "0.0.0",
+                    "end": "0.2.0",
+                    "vol": 0,
+                    "endVol": 1
+                },
+                {
+                    "key": "E",
+                    "octave": 4, 
+                    "start": "0.2.0",
+                    "end": "0.4.0",
+                    "vol": 0,
+                    "endVol": 1
+                },
+                {
+                    "key": "G",
+                    "octave": 4, 
+                    "start": "0.4.0",
+                    "end": "0.6.0",
+                    "vol": 0,
+                    "endVol": 1
+                },
+                {
+                    "key": "C",
+                    "octave": 4, 
+                    "start": "0.8.0",
+                    "end": "0.16.0",
+                    "vol": 0,
+                    "endVol": 1
+                },
+                {
+                    "key": "E",
+                    "octave": 4, 
+                    "start": "0.8.0",
+                    "end": "0.16.0",
+                    "vol": 0,
+                    "endVol": 1
+                },
+                {
+                    "key": "G",
+                    "octave": 4, 
+                    "start": "0.8.0",
+                    "end": "0.16.0",
+                    "vol": 0,
+                    "endVol": 1
+                }
+            ]
+        }
+    ]
+}
